@@ -13,6 +13,13 @@ public class Note
 	public string? Text { get; set; }
 	public DateTime? DueDate { get; set; }
 
+	//TODO
+	[JsonConstructor]
+	public Note()
+	{
+
+	}
+
 	public Note(string owner, DateTime createDate, string? text, DateTime? dueDate)
 	{
 		Owner = owner;

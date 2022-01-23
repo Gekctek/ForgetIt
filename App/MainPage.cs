@@ -5,7 +5,7 @@ using SQLite;
 using System.Collections.Generic;
 using View = Comet.View;
 
-namespace App;
+namespace ForgetIt.App;
 
 
 public class MainPage : View
@@ -19,24 +19,28 @@ public class MainPage : View
 
 	public MainPage()
 	{
-		_store = new SQLiteOperationStore(new SQLiteConnection("Operations.db"));
+		string applicationFolderPath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Personal), "Operations");
+
+		// Create the folder path.
+		Directory.CreateDirectory(applicationFolderPath);
+
+		string databaseFileName = System.IO.Path.Combine(applicationFolderPath, "Operations.db");
+		_store = new SQLiteOperationStore(new SQLiteConnection(databaseFileName, SQLiteOpenFlags.Create | SQLiteOpenFlags.ReadWrite));
 
 		ObjectInfo objectInfo = _store.Get("1", "note");
 
 		_state = new State(objectInfo.Id, objectInfo.Type, objectInfo.Operations);
-	}
 
-	[Body]
-	View body()
-		=> new VStack {
-				new Text(()=> comet.Text)
+		this.Title("Notes");
+
+		Body = () => new VStack {
+				new TextEditor(() => comet.Text)
 					.Frame(width:300)
 					.LineBreakMode(LineBreakMode.CharacterWrap),
 
 				new Comet.CheckBox(() => comet.HasDueDate),
 
-				new Comet.DatePicker(()=> comet.DueDate)
-					.Enabled(() => comet.HasDueDate)
+				new Comet.DatePicker(() => comet.DueDate)
 					.Frame(width:300)
 					.LineBreakMode(LineBreakMode.CharacterWrap),
 
@@ -48,6 +52,7 @@ public class MainPage : View
 				.RoundedBorder(color:Colors.Blue)
 				.Shadow(Colors.Grey,4,2,2),
 		};
+	}
 
 	private void Save()
 	{

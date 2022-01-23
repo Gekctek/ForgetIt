@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace ForgetIt.Core
@@ -15,6 +16,13 @@ namespace ForgetIt.Core
 		public JsonPath Path { get; set; }
 		public JsonNode? Value { get; set; }
 		public JsonPath? From { get; set; }
+
+		//TODO
+		[JsonConstructor]
+		public PatchOperation()
+		{
+
+		}
 
 		private PatchOperation(OperationType type, JsonPath path, JsonNode? value, JsonPath? from)
 		{

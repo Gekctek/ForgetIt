@@ -16,7 +16,7 @@ if (!objectInfo.Operations.Any())
 	List<PatchOperation> operations = state.Update(newNote);
 	if (operations.Any())
 	{
-		var info = new ObjectInfo(objectInfo.Id, objectInfo.Type, objectInfo.Operations);
+		var info = new ObjectInfo(objectInfo.Id, objectInfo.Type, operations);
 		store.Add(info);
 	}
 }

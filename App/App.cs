@@ -2,7 +2,7 @@ using Comet;
 using Microsoft.Maui.Hosting;
 using View = Comet.View;
 
-namespace App;
+namespace ForgetIt.App;
 public class App : CometApp
 {
 	[Body]
@@ -17,7 +17,9 @@ public class App : CometApp
 				fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
 			});
 		//-:cnd
-
+#if DEBUG
+			builder.EnableHotReload();
+#endif
 		//+:cnd
 		return builder.Build();
 	}

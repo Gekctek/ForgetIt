@@ -26,7 +26,7 @@ namespace Data
 
 		public PatchOperation ToCommon()
 		{
-			return JsonSerializer.Deserialize<PatchOperation>(this.Json) ?? throw new Exception($"Invalid json '{this.Json}'");
+			return PatchOperation.ParseJson(this.Json);
 		}
 	}
 }
