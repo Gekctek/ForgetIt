@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core", "Core\Core.csproj", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Hypercore", "Hypercore", "{F4FF3849-C65D-4926-92A0-0C53D1E76C8C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core", "..\..\hypercore-dotnet\Core\Core.csproj", "{6D0A33AD-F642-410A-92D0-85F9D8DEEB7D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core", "..\hypercore-dotnet\Core\Core.csproj", "{6D0A33AD-F642-410A-92D0-85F9D8DEEB7D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1E46C010-247C-48A7-866A-AFD1D7068B68}"
 	ProjectSection(SolutionItems) = preProject

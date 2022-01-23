@@ -1,20 +1,28 @@
-﻿namespace App
+﻿using ForgetIt.Core;
+
+namespace App
 {
 	public partial class MainPage : ContentPage
 	{
-		int count = 0;
+		public Note Note { get; set; }
+		private readonly State<Note> state;
+
 
 		public MainPage()
 		{
+			Note = new Note("1", "me", DateTime.UtcNow, null, null);
+			state = new State<Note>();
+			state.Update(Note);
+
+			state.Update(new Note("1", "you", DateTime.UtcNow, "Test Text", null));
+
+			Note note = state.Build();
 			InitializeComponent();
 		}
 
-		private void OnCounterClicked(object sender, EventArgs e)
+		private void OnSaveClicked(object sender, EventArgs e)
 		{
-			count++;
-			CounterLabel.Text = $"Current count: {count}";
-
-			SemanticScreenReader.Announce(CounterLabel.Text);
+			state.Update(Note);
 		}
 	}
 }

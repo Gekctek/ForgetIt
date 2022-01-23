@@ -19,6 +19,10 @@ namespace ForgetIt.Core
 		{
 			Type = type;
 			Path = path ?? throw new ArgumentNullException(nameof(path));
+			if (value != null && value.Parent != null)
+			{
+				throw new ArgumentException("Value json can't have a parent node");
+			}
 			Value = value;
 			From = from;
 		}
@@ -28,8 +32,12 @@ namespace ForgetIt.Core
 		/// If the target location specifies an object member that does not already exist, a new member is added to the object.
 		/// If the target location specifies an object member that does exist, that member's value is replaced.
 		/// </summary>
-		public static PatchOperation Add(JsonPath path, JsonNode value)
+		public static PatchOperation Add(JsonPath path, JsonNode? value)
 		{
+			if (value != null)
+			{
+				value = JsonUtil.Clone(value); // Not cloning causes issues when settings values in JsonNodes
+			}
 			return new PatchOperation(OperationType.Add, path, value, null);
 		}
 
@@ -45,8 +53,12 @@ namespace ForgetIt.Core
 		/// The "replace" operation replaces the value at the target location with a new value.The operation object MUST contain a "value" member whose content specifies the replacement value.
 		/// The target location MUST exist for the operation to be successful.
 		/// </summary>
-		public static PatchOperation Replace(JsonPath path, JsonNode value)
+		public static PatchOperation Replace(JsonPath path, JsonNode? value)
 		{
+			if (value != null)
+			{
+				value = JsonUtil.Clone(value); // Not cloning causes issues when settings values in JsonNodes
+			}
 			return new PatchOperation(OperationType.Replace, path, value, null);
 		}
 
@@ -57,6 +69,10 @@ namespace ForgetIt.Core
 		/// </summary>
 		public static PatchOperation Copy(JsonPath path, JsonPath from)
 		{
+			if (from == null)
+			{
+				throw new ArgumentNullException(nameof(from));
+			}
 			return new PatchOperation(OperationType.Copy, path, null, from);
 		}
 
@@ -67,6 +83,10 @@ namespace ForgetIt.Core
 		/// </summary>
 		public static PatchOperation Move(JsonPath path, JsonPath from)
 		{
+			if (from == null)
+			{
+				throw new ArgumentNullException(nameof(from));
+			}
 			return new PatchOperation(OperationType.Move, path, null, from);
 		}
 
@@ -74,8 +94,12 @@ namespace ForgetIt.Core
 		/// The "test" operation tests that a value at the target location is equal to a specified value.
 		/// The target location MUST be equal to the "value" value for the operation to be considered successful.
 		/// </summary>
-		public static PatchOperation Test(JsonPath path, JsonNode value)
+		public static PatchOperation Test(JsonPath path, JsonNode? value)
 		{
+			if (value != null)
+			{
+				value = JsonUtil.Clone(value); // Not cloning causes issues when settings values in JsonNodes
+			}
 			return new PatchOperation(OperationType.Move, path, value, null);
 		}
 
@@ -106,7 +130,8 @@ namespace ForgetIt.Core
 					{
 						throw new InvalidOperationException("Arrays require an index, not a property");
 					}
-					JsonNode? a = jArray[pathSegment.AsIndex];
+					// Get index or last entry
+					JsonNode? a = jArray[pathSegment.AsIndex ?? jArray.Count];
 					if (a == null)
 					{
 						return new GetNodeResult(node, path.ToArray());
@@ -174,7 +199,7 @@ namespace ForgetIt.Core
 						{
 							throw new Exception($"Operation can't {this.Type} from '{this.Path}' because it does not exist");
 						}
-						if(this.Value == null)
+						if (this.Value == null)
 						{
 							throw new InvalidOperationException($"Can't {this.Type} with unspecified value");
 						}
@@ -193,28 +218,36 @@ namespace ForgetIt.Core
 					throw new Exception($"Operation can't {this.Type} from '{this.Path}' because it does not exist");
 				}
 				(JsonNode fromLeaf, JsonPathSegment fromLastSegment) = fromResult.GetOrBuildRemainingNodes();
-				JsonNode fromValue;
+				JsonNode? fromValue;
 				if (fromLastSegment.IsIndex)
 				{
-					fromValue = fromLeaf[fromLastSegment.AsIndex]!;
+					// Get index or last index
+					fromValue = fromLeaf[fromLastSegment.AsIndex ?? fromLeaf.AsArray().Count];
 				}
 				else
 				{
-					fromValue = fromLeaf[fromLastSegment.AsIndex]!;
+					fromValue = fromLeaf[fromLastSegment.AsProperty];
 				}
 				SetValue(fromValue);
 			}
 
 			void SetValue(JsonNode? value)
 			{
-				if (value == null)
+				if (value != null)
 				{
-					throw new InvalidOperationException($"Can't {this.Type} with unspecified value");
+					value = JsonUtil.Clone(value);
 				}
 				(JsonNode leaf, JsonPathSegment lastSegment) = result.GetOrBuildRemainingNodes();
 				if (lastSegment.IsIndex)
 				{
-					leaf[lastSegment.AsIndex] = value;
+					if (lastSegment.AsIndex == null)
+					{
+						leaf.AsArray().Add(value);
+					}
+					else
+					{
+						leaf[lastSegment.AsIndex.Value] = value;
+					}
 				}
 				else
 				{
@@ -231,12 +264,34 @@ namespace ForgetIt.Core
 				(JsonNode leaf, JsonPathSegment lastSegment) = result.GetOrBuildRemainingNodes();
 				if (lastSegment.IsIndex)
 				{
-					leaf.AsArray().RemoveAt(lastSegment.AsIndex);
+					// Remove index or last entry
+					leaf.AsArray().RemoveAt(lastSegment.AsIndex ?? leaf.AsArray().Count);
 				}
 				else
 				{
 					leaf.AsObject().Remove(lastSegment.AsProperty);
 				}
+			}
+		}
+
+		public override string ToString()
+		{
+			switch (this.Type)
+			{
+				case OperationType.Replace:
+					return $"Replace '{this.Path}' with {this.Value!.ToJsonString()}";
+				case OperationType.Add:
+					return $"Add {this.Value?.ToJsonString()} to '{this.Path}'";
+				case OperationType.Copy:
+					return $"Copy '{this.From!}' to '{this.Path}'";
+				case OperationType.Remove:
+					return $"Remove '{this.Path}'";
+				case OperationType.Test:
+					return $"Test '{this.Path}' with {this.Value?.ToJsonString()}";
+				case OperationType.Move:
+					return $"Move '{this.From!}' to '{this.Path}'";
+				default:
+					throw new NotImplementedException();
 			}
 		}
 	}
@@ -270,7 +325,8 @@ namespace ForgetIt.Core
 				JsonPathSegment lastSegment = this.RemainingPath[0];
 				if (lastSegment.IsIndex)
 				{
-					return this.LastNode[lastSegment.AsIndex];
+					// Get index or last entry
+					return this.LastNode[lastSegment.AsIndex ?? this.LastNode.AsArray().Count];
 				}
 				return this.LastNode[lastSegment.AsProperty];
 			}

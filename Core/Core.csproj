@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\hypercore-dotnet\Core\Core.csproj" />
+    <ProjectReference Include="..\..\hypercore-dotnet\Core\Core.csproj" />
   </ItemGroup>
 
 </Project>

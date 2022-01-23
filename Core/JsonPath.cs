@@ -28,8 +28,10 @@ namespace ForgetIt.Core
 		public override string ToString()
 		{
 			var b = new StringBuilder();
-			foreach(JsonPathSegment segment in this.Segments)
+
+			foreach (JsonPathSegment segment in this.Segments)
 			{
+				b.Append("/");
 				b.Append(segment.ToString());
 			}
 			return b.ToString();
@@ -51,21 +53,21 @@ namespace ForgetIt.Core
 	public class JsonPathSegment
 	{
 		public bool IsIndex { get; }
-		private object _value;
+		private object? _value;
 
-		private JsonPathSegment(bool isIndex, object value)
+		private JsonPathSegment(bool isIndex, object? value)
 		{
 			this.IsIndex = isIndex;
 			this._value = value;
 		}
 
-		public int AsIndex
+		public int? AsIndex
 		{
 			get
 			{
 				if (this.IsIndex)
 				{
-					return (int)_value;
+					return (int?)_value;
 				}
 				throw new InvalidOperationException("Json path segment is a property, not an index");
 			}
@@ -77,7 +79,7 @@ namespace ForgetIt.Core
 			{
 				if (!this.IsIndex)
 				{
-					return (string)_value;
+					return (string)_value!;
 				}
 				throw new InvalidOperationException("Json path segment is an index, not a property");
 			}
@@ -87,12 +89,12 @@ namespace ForgetIt.Core
 		{
 			if (this.IsIndex)
 			{
-				return this.AsIndex.ToString();
+				return this.AsIndex?.ToString() ?? "-";
 			}
 			return this.AsProperty;
 		}
 
-		public static JsonPathSegment Index(int index)
+		public static JsonPathSegment Index(int? index)
 		{
 			return new JsonPathSegment(true, index);
 		}
