@@ -6,18 +6,12 @@ using System.Text.Json.Serialization;
 
 namespace ForgetIt.Core;
 
-public class Note : StatefulObject
+public class Note
 {
 	public string Owner { get; set; }
 	public DateTime CreateDate { get; set; }
 	public string? Text { get; set; }
 	public DateTime? DueDate { get; set; }
-
-	[JsonConstructor]
-	public Note()
-	{
-
-	}
 
 	public Note(string owner, DateTime createDate, string? text, DateTime? dueDate)
 	{
@@ -25,10 +19,5 @@ public class Note : StatefulObject
 		CreateDate = createDate;
 		Text = text;
 		DueDate = dueDate;
-	}
-
-	protected override JsonDocument BuildSnapshot()
-	{
-		return JsonSerializer.SerializeToDocument(this);
 	}
 }

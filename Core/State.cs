@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -23,11 +24,22 @@ namespace ForgetIt.Core
 			_operations = operations ?? new List<PatchOperation>();
 		}
 
-		public List<PatchOperation> Update<T>(T obj) where T : StatefulObject
+		public PatchOperation Update<T, TProperty>(Expression<Func<T, TProperty>> propertyExpr, TProperty value)
+		{
+			MemberExpression memberExpression = propertyExpr.Body as MemberExpression ?? throw new InvalidOperationException("Only member expressions can be used for state updates");
+
+			string propertyName = memberExpression.Member.Name;
+			propertyName = JsonNamingPolicy.CamelCase.ConvertName(propertyName);
+			var path = new JsonPath(new JsonPathSegment[1] { JsonPathSegment.Property(propertyName) });
+			JsonNode? node = JsonValue.Create(value);
+			return PatchOperation.Add(path, node);
+		}
+
+		public List<PatchOperation> Update<T>(T obj)
 		{
 			JsonObject currentObj = GetSnapshot();
 
-			JsonDocument newDoc = obj.GetSnapshot();
+			JsonDocument newDoc = JsonSerializer.SerializeToDocument(obj);
 			JsonObject newObj = JsonObject.Create(newDoc.RootElement)!;
 
 			List<PatchOperation> newOperations = BuildPatch(currentObj, newObj, JsonPath.Empty()).ToList();

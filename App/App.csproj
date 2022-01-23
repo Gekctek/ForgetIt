@@ -55,7 +55,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <PackageReference Include="Clancey.Comet" Version="0.3.443-beta" />
 	  <PackageReference Include="sqlite-net-pcl" Version="1.8.116" />
+		<PackageReference Include="Reloadify3000" Version="1.0.8" />
 	</ItemGroup>
 
 	<ItemGroup>
