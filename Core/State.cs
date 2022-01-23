@@ -8,17 +8,22 @@ using System.Threading.Tasks;
 
 namespace ForgetIt.Core
 {
-	public class State<T> where T : StatefulObject
+	public class State
 	{
-		public List<PatchOperation> Operations { get; }
+		public string Id { get; }
+		public string Type { get; }
+		public IReadOnlyList<PatchOperation> Operations => this._operations;
+		private readonly List<PatchOperation> _operations;
 		private JsonObject? _snapshotCache = null;
 
-		public State(List<PatchOperation>? operations = null)
+		public State(string id, string type, List<PatchOperation>? operations = null)
 		{
-			Operations = operations ?? new List<PatchOperation>();
+			Id = id;
+			Type = type;
+			_operations = operations ?? new List<PatchOperation>();
 		}
 
-		public void Update(T obj)
+		public List<PatchOperation> Update<T>(T obj) where T : StatefulObject
 		{
 			JsonObject currentObj = GetSnapshot();
 
@@ -28,19 +33,22 @@ namespace ForgetIt.Core
 			List<PatchOperation> newOperations = BuildPatch(currentObj, newObj, JsonPath.Empty()).ToList();
 			if (newOperations.Any())
 			{
-				this.Operations.AddRange(newOperations);
+				this._operations.AddRange(newOperations);
+				this._snapshotCache = null;
 			}
+			return newOperations;
+		}
+
+		public void Add(PatchOperation operation)
+		{
+			this._operations.Add(operation);
 			this._snapshotCache = null;
 		}
 
-		public T Build()
+		public T Build<T>()
 		{
 			JsonObject snapshot = GetSnapshot();
 
-			foreach (PatchOperation operation in this.Operations)
-			{
-				operation.Apply(snapshot);
-			}
 			return snapshot.Deserialize<T>()!;
 		}
 

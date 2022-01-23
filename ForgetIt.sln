@@ -16,6 +16,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Data", "Data\Data.csproj", "{BF8BA227-BCA3-4756-8C2C-84583CEB56D1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CLI", "CLI\CLI.csproj", "{0AF6FD27-141A-4B71-ADCC-7BFF5059BA55}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,6 +40,14 @@ Global
 		{6D0A33AD-F642-410A-92D0-85F9D8DEEB7D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6D0A33AD-F642-410A-92D0-85F9D8DEEB7D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6D0A33AD-F642-410A-92D0-85F9D8DEEB7D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF8BA227-BCA3-4756-8C2C-84583CEB56D1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF8BA227-BCA3-4756-8C2C-84583CEB56D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF8BA227-BCA3-4756-8C2C-84583CEB56D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF8BA227-BCA3-4756-8C2C-84583CEB56D1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0AF6FD27-141A-4B71-ADCC-7BFF5059BA55}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0AF6FD27-141A-4B71-ADCC-7BFF5059BA55}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0AF6FD27-141A-4B71-ADCC-7BFF5059BA55}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0AF6FD27-141A-4B71-ADCC-7BFF5059BA55}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

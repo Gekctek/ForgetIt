@@ -11,13 +11,14 @@ namespace ForgetIt.Core
 			this.Segments = segments ?? throw new ArgumentNullException(nameof(segments));
 		}
 
-		public JsonPath Parse(string path)
+		public static JsonPath Parse(string path)
 		{
-			string[] pathSegments = path.Split('/');
+			// TODO what about //?
+			string[] pathSegments = path.Split('/', StringSplitOptions.RemoveEmptyEntries);
 			return Parse(pathSegments);
 		}
 
-		public JsonPath Parse(string[] pathSegments)
+		public static JsonPath Parse(IEnumerable<string> pathSegments)
 		{
 			JsonPathSegment[] segments = pathSegments
 				.Select(JsonPathSegment.Parse)

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 
@@ -25,6 +26,89 @@ namespace ForgetIt.Core
 			}
 			Value = value;
 			From = from;
+		}
+
+		public static PatchOperation ParseJson(string json)
+		{
+			JsonNode node = JsonNode.Parse(json) ?? throw new Exception($"Could not parse json '{json}'");
+			string op = node["op"]!.GetValue<string>();
+			OperationType type = op switch
+			{
+				"copy" => OperationType.Copy,
+				"move" => OperationType.Move,
+				"remove" => OperationType.Remove,
+				"replace" => OperationType.Replace,
+				"test" => OperationType.Test,
+				"add" => OperationType.Add,
+				_ => throw new NotImplementedException($"op '{op}'")
+			};
+			JsonPath path = JsonPath.Parse(node["path"]!.GetValue<string>());
+			JsonNode? value = node["value"];
+			if(value != null)
+			{
+				// Clone it to remove parent
+				value = JsonUtil.Clone(value);
+			}
+			string? fromString = node["from"]?.GetValue<string>();
+			JsonPath? from = fromString != null ? JsonPath.Parse(fromString) : null;
+
+			return new PatchOperation(type, path, value, from);
+		}
+
+		public string ToJson()
+		{
+			bool showValue;
+			bool showFrom;
+			string op;
+			switch (this.Type)
+			{
+				case OperationType.Copy:
+					op = "copy";
+					showValue = false;
+					showFrom = true;
+					break;
+				case OperationType.Move:
+					op = "move";
+					showValue = false;
+					showFrom = true;
+					break;
+				case OperationType.Remove:
+					op = "remove";
+					showValue = false;
+					showFrom = false;
+					break;
+				case OperationType.Replace:
+					op = "replace";
+					showValue = true;
+					showFrom = false;
+					break;
+				case OperationType.Test:
+					op = "test";
+					showValue = true;
+					showFrom = false;
+					break;
+				case OperationType.Add:
+					op = "add";
+					showValue = true;
+					showFrom = false;
+					break;
+				default:
+					throw new NotImplementedException();
+			}
+			var obj = new JsonObject
+			{
+				{ "op", op },
+				{ "path", this.Path.ToString() }
+			};
+			if (showValue)
+			{
+				obj.Add("value", this.Value);
+			}
+			if (showFrom)
+			{
+				obj.Add("from", this.From!.ToString());
+			}
+			return obj.ToJsonString();
 		}
 
 		/// <summary>
