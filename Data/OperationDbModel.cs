@@ -9,17 +9,15 @@ namespace Data
 		[PrimaryKey, AutoIncrement]
 		public int Id { get; set; }
 		[Indexed]
-		public string ObjectId { get; set; }
-		[Indexed]
-		public string ObjectType { get; set; }
+		public string Type { get; set; }
 		public string Json { get; set; }
 
-		public static OperationDbModel FromCommon(string id, string type, PatchOperation operation)
+		public static OperationDbModel FromCommon(int? id, string type, PatchOperation operation)
 		{
 			return new OperationDbModel
 			{
-				ObjectId = id,
-				ObjectType = type,
+				Id = id ?? 0,
+				Type = type,
 				Json = operation.ToJson()
 			};
 		}

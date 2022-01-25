@@ -17,18 +17,23 @@ namespace Data
 			this._db.CreateTable<OperationDbModel>();
 		}
 
-		public void Add(ObjectInfo info)
+		public void Add(int id, string type, IEnumerable<PatchOperation> operations)
 		{
-			List<OperationDbModel> opEntities = info.Operations
-				.Select(o => OperationDbModel.FromCommon(info.Id, info.Type, o))
+			List<OperationDbModel> opEntities = operations
+				.Select(o => OperationDbModel.FromCommon(id, type, o))
 				.ToList();
 			this._db.InsertAll(opEntities, runInTransaction: true);
 		}
 
-		public ObjectInfo Get(string id, string type)
+		public void Add(int id, string type, params PatchOperation[] operations)
+		{
+			Add(id, type, (IEnumerable<PatchOperation>)operations);
+		}
+
+		public ObjectInfo Get(int id, string type)
 		{
 			List<PatchOperation> operations = this._db.Table<OperationDbModel>()
-				.Where(m => m.ObjectType == type && m.ObjectId == id)
+				.Where(m => m.Type == type && m.Id == id)
 				.Select(o => o.ToCommon())
 				.ToList();
 

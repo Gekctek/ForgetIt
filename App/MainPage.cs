@@ -60,7 +60,7 @@ public class MainPage : View
 		PatchOperation operation2 = _state.Update<Note, DateTime?>(n => n.DueDate, comet.HasDueDate ? comet.DueDate : null);
 
 		
-		_store.Add(new ObjectInfo(_state.Id, _state.Type, new List<PatchOperation> { operation1, operation2 }));
+		_store.Add(_state.Id, _state.Type, operation1, operation2);
 	}
 
 	public class CometRide : BindingObject
