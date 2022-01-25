@@ -14,7 +14,7 @@ namespace ForgetIt.Core
 		public static JsonPath Parse(string path)
 		{
 			// TODO what about //?
-			string[] pathSegments = path.Split('/', StringSplitOptions.RemoveEmptyEntries);
+			string[] pathSegments = path.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
 			return Parse(pathSegments);
 		}
 

@@ -5,11 +5,25 @@ using System;
 using System.Text.Json;
 using Automerge;
 
-using(AutomergeBackend automerge = AutomergeBackend.Init())
+
+namespace CLI
 {
-	int result = automerge.ApplyLocalChange("{}");
-	
-	Console.WriteLine(result);
+	public static class Program
+	{
+		public static void Main(string[] args)
+		{
+			using (AutomergeBackend automerge = AutomergeBackend.Init())
+			{
+				automerge.ApplyLocalChange("{}");
+				using (AutomergeBackend automerge2 = automerge.Clone())
+				{
+					automerge.ApplyLocalChange("{}");
+				}
+
+					Console.WriteLine();
+			}
+		}
+	}
 }
 // var store = new SQLiteOperationStore(new SQLiteConnection("Operations.db"));
 

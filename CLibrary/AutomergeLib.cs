@@ -5,13 +5,13 @@ namespace CLibrary
 {
 	public static class AutomergeLib
 	{
-		private const string autmergeLibPath = "automerge/libautomerge.so";
+		private const string automergeLibPath = "libautomerge.dll"; // TODO
 
 		/// <summary>
 		/// Initialized the backend instance
 		/// </summary>
 		/// <returns>Instance of a backend</returns>
-		[DllImport(autmergeLibPath, EntryPoint = "automerge_init")]
+		[DllImport(automergeLibPath, EntryPoint = "automerge_init")]
 		public unsafe static extern IntPtr Init();
 
 		/// <summary>
@@ -22,9 +22,12 @@ namespace CLibrary
 		/// <param name="changes">Bytes of the changes in json</param>
 		/// <param name="changeLength">Length of the changes bytes</param>
 		/// <returns>Length of the result written to the buffer</returns>
-		[DllImport(autmergeLibPath, EntryPoint = "automerge_apply_local_change", CharSet = CharSet.Ansi)]
-		[return: MarshalAs(UnmanagedType.SysInt)] // Convert isize to int
-		public static extern int ApplyLocalChange(IntPtr backend, IntPtr buffer, byte[] changes, UIntPtr changeLength);
+		[DllImport(automergeLibPath, EntryPoint = "automerge_apply_local_change", CharSet = CharSet.Ansi)]
+		public static extern IntPtr ApplyLocalChange(
+			IntPtr backend,
+			[MarshalAs(UnmanagedType.Struct)] Buffer buffer,
+			byte[] changes,
+			UIntPtr changeLength);
 
 		/// <summary>
 		/// Clones the automerge backend
@@ -32,16 +35,16 @@ namespace CLibrary
 		/// <param name="backend">Current instance of the automerge backend</param>
 		/// <param name="newBackend">The cloned automerge backend</param>
 		/// <returns>0</returns>
-		[DllImport(autmergeLibPath, EntryPoint = "automerge_clone")]
-		[return: MarshalAs(UnmanagedType.SysInt)] // Convert isize to int
-		public static extern int automerge_clone(IntPtr backend, out IntPtr newBackend);
+		[DllImport(automergeLibPath, EntryPoint = "automerge_clone")]
+		public static extern IntPtr Clone(IntPtr backend, out IntPtr newBackend);
 
 		/// <summary>
 		/// Creates a buffer to store return values
 		/// </summary>
 		/// <returns>The buffer to use for requests</returns>
-		[DllImport("automerge/libautomerge.so", EntryPoint = "automerge_create_buff")]
-		public static extern IntPtr CreateBuffer();
+		[DllImport(automergeLibPath, EntryPoint = "automerge_create_buff")]
+		[return: MarshalAs(UnmanagedType.Struct)]
+		public static extern Buffer CreateBuffer();
 
 		/// <summary>
 		/// Decodes the change TODO
@@ -51,8 +54,8 @@ namespace CLibrary
 		/// <param name="changes">Bytes of the changes in json</param>
 		/// <param name="changeLength">Length of the changes bytes</param>
 		/// <returns>0</returns>
-		[DllImport("automerge/libautomerge.so", EntryPoint = "automerge_decode_change")]
-		public static extern IntPtr DecodeChange(IntPtr backend, IntPtr buffs, byte[] changes, UIntPtr changeLength);
+		[DllImport(automergeLibPath, EntryPoint = "automerge_decode_change")]
+		public static extern IntPtr DecodeChange(IntPtr backend, Buffer buffs, byte[] changes, UIntPtr changeLength);
 
 		/// <summary>
 		/// Decodes the Sync State TODO
@@ -61,10 +64,10 @@ namespace CLibrary
 		/// <param name="encodedState">Encoded state bytes TODO</param>
 		/// <param name="encodedStateLength">Length of the encoded state bytes</param>
 		/// <param name="syncState">TODO</param>
-		/// <returns></returns>
-		[DllImport("automerge/libautomerge.so", EntryPoint = "automerge_decode_sync_state")]
+		/// <returns>0</returns>
+		[DllImport(automergeLibPath, EntryPoint = "automerge_decode_sync_state")]
 		public static extern IntPtr DecodeSyncState(
-			IntPtr backend,
+			Backend backend,
 			IntPtr encodedState,
 			UIntPtr encodedStateLength,
 		    out IntPtr syncState);

@@ -1,25 +1,26 @@
 using CLibrary;
 using System;
 using System.Text;
+using Buffer = CLibrary.Buffer;
 
 namespace Automerge
 {
 
-    public class AutomergeBackend : IDisposable
+    public class AutomergeBackend : IDisposable, ICloneable
     {
         private IntPtr _backend;
-        private IntPtr _buffer;
-        private AutomergeBackend(IntPtr backend, IntPtr buffer)
+        private Buffer _buffer;
+        private AutomergeBackend(IntPtr backend, Buffer buffer)
         {
             _backend = backend;
             _buffer = buffer;
         }
 
-        public int ApplyLocalChange(string request)
+        public void ApplyLocalChange(string request)
         {
             byte[] changes = Encoding.UTF8.GetBytes(request);
             UIntPtr changesLength = new UIntPtr(Convert.ToUInt32(changes.Length));
-            return AutomergeLib.ApplyLocalChange(this._backend, this._buffer, changes, changesLength);
+            IntPtr ptr = AutomergeLib.ApplyLocalChange(this._backend, this._buffer, changes, changesLength);
         }
 
         public void Dispose()
@@ -30,8 +31,20 @@ namespace Automerge
         public static AutomergeBackend Init()
         {
             IntPtr backend = AutomergeLib.Init();
-            IntPtr buffer = AutomergeLib.CreateBuffer();
+            Buffer buffer = AutomergeLib.CreateBuffer();
             return new AutomergeBackend(backend, buffer);
         }
-    }
+
+		public AutomergeBackend Clone()
+		{
+            AutomergeLib.Clone(this._backend, out IntPtr newBackend);
+            Buffer buffer = AutomergeLib.CreateBuffer();
+            return new AutomergeBackend(newBackend, buffer);
+        }
+
+		object ICloneable.Clone()
+		{
+            return Clone();
+		}
+	}
 }

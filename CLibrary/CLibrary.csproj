@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -8,8 +8,13 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-  <None Update="automerge/libautomerge.so">
-    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-  </None>
+    <None Update="automerge\libautomerge-linux.so" Condition="$([MSBuild]::IsOSPlatform('Linux'))">
+			<Link>libautomerge.so</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="automerge\libautomerge-win.dll" Condition="$([MSBuild]::IsOSPlatform('Windows'))">
+			<Link>libautomerge.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 </Project>

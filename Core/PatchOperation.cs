@@ -235,7 +235,7 @@ namespace ForgetIt.Core
 				default:
 					throw new NotImplementedException();
 			}
-			return GetBaseNode(innerNode, path[1..]);
+			return GetBaseNode(innerNode, path.Slice(1));
 		}
 
 		public void Apply(JsonObject snapshot)
@@ -438,7 +438,7 @@ namespace ForgetIt.Core
 					? new JsonArray()
 					: new JsonObject();
 
-			return BuildNode(node, path[1..]);
+			return BuildNode(node, path.Slice(1));
 		}
 	}
 
