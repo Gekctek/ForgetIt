@@ -27,7 +27,7 @@ public class MainPage : View
 		string databaseFileName = System.IO.Path.Combine(applicationFolderPath, "Operations.db");
 		_store = new SQLiteOperationStore(new SQLiteConnection(databaseFileName, SQLiteOpenFlags.Create | SQLiteOpenFlags.ReadWrite));
 
-		ObjectInfo objectInfo = _store.Get("1", "note");
+		ObjectInfo objectInfo = _store.Get(1, "note");
 
 		_state = new State(objectInfo.Id, objectInfo.Type, objectInfo.Operations);
 

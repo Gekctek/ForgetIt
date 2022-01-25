@@ -7,7 +7,8 @@ using Automerge;
 
 using(AutomergeBackend automerge = AutomergeBackend.Init())
 {
-	string result = automerge.ApplyLocalChange("{}");
+	int result = automerge.ApplyLocalChange("{}");
+	
 	Console.WriteLine(result);
 }
 // var store = new SQLiteOperationStore(new SQLiteConnection("Operations.db"));

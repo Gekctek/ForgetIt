@@ -12,9 +12,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\hypercore-dotnet\Core\Core.csproj" />
 		<ProjectReference Include="..\Data\Data.csproj" />
-    <ProjectReference Include="..\..\hypercore-dotnet\CLibrary\CLibrary.csproj" />
 	</ItemGroup>
 
 </Project>

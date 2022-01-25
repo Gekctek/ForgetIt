@@ -4,13 +4,12 @@
     <TargetFramework>net6</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <LangVersion>latest</LangVersion>
     <AssemblyName>ForgetIt.$(MSBuildProjectName)</AssemblyName>
     <RootNamespace>ForgetIt.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\hypercore-dotnet\Core\Core.csproj" />
+    <ProjectReference Include="..\CLibrary\CLibrary.csproj" />
   </ItemGroup>
 
 </Project>

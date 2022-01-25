@@ -11,13 +11,13 @@ namespace ForgetIt.Core
 {
 	public class State
 	{
-		public string Id { get; }
+		public int Id { get; }
 		public string Type { get; }
 		public IReadOnlyList<PatchOperation> Operations => this._operations;
 		private readonly List<PatchOperation> _operations;
 		private JsonObject? _snapshotCache = null;
 
-		public State(string id, string type, List<PatchOperation>? operations = null)
+		public State(int id, string type, List<PatchOperation>? operations = null)
 		{
 			Id = id;
 			Type = type;
