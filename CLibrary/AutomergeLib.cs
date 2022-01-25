@@ -5,8 +5,11 @@ namespace CLibrary
 {
 	public static class AutomergeLib
 	{
-		private const string automergeLibPath = "libautomerge.dll"; // TODO
-
+#if _WINDOWS
+		private const string automergeLibPath = "libautomerge.dll";
+#else
+		private const string automergeLibPath = "libautomerge.so";
+#endif
 		/// <summary>
 		/// Initialized the backend instance
 		/// </summary>
@@ -23,7 +26,7 @@ namespace CLibrary
 		/// <param name="changeLength">Length of the changes bytes</param>
 		/// <returns>Length of the result written to the buffer</returns>
 		[DllImport(automergeLibPath, EntryPoint = "automerge_apply_local_change", CharSet = CharSet.Ansi)]
-		public static extern IntPtr ApplyLocalChange(
+		public static extern int ApplyLocalChange(
 			IntPtr backend,
 			[MarshalAs(UnmanagedType.Struct)] Buffer buffer,
 			byte[] changes,
@@ -34,7 +37,7 @@ namespace CLibrary
 		/// </summary>
 		/// <param name="backend">Current instance of the automerge backend</param>
 		/// <param name="newBackend">The cloned automerge backend</param>
-		/// <returns>0</returns>
+		/// <returns>0 if successful, -1 if error</returns>
 		[DllImport(automergeLibPath, EntryPoint = "automerge_clone")]
 		public static extern IntPtr Clone(IntPtr backend, out IntPtr newBackend);
 
@@ -50,12 +53,12 @@ namespace CLibrary
 		/// Decodes the change TODO
 		/// </summary>
 		/// <param name="backend">Current backend instance</param>
-		/// <param name="buffs">Buffer to write the response to</param>
+		/// <param name="buffer">Buffer to write the response to</param>
 		/// <param name="changes">Bytes of the changes in json</param>
 		/// <param name="changeLength">Length of the changes bytes</param>
-		/// <returns>0</returns>
+		/// <returns>0 if successful, -1 if error</returns>
 		[DllImport(automergeLibPath, EntryPoint = "automerge_decode_change")]
-		public static extern IntPtr DecodeChange(IntPtr backend, Buffer buffs, byte[] changes, UIntPtr changeLength);
+		public static extern IntPtr DecodeChange(IntPtr backend, Buffer buffer, byte[] change, UIntPtr changeLength);
 
 		/// <summary>
 		/// Decodes the Sync State TODO
@@ -64,149 +67,266 @@ namespace CLibrary
 		/// <param name="encodedState">Encoded state bytes TODO</param>
 		/// <param name="encodedStateLength">Length of the encoded state bytes</param>
 		/// <param name="syncState">TODO</param>
-		/// <returns>0</returns>
+		/// <returns>0 if successful, -1 if error</returns>
 		[DllImport(automergeLibPath, EntryPoint = "automerge_decode_sync_state")]
 		public static extern IntPtr DecodeSyncState(
-			Backend backend,
+			IntPtr backend,
 			IntPtr encodedState,
 			UIntPtr encodedStateLength,
 		    out IntPtr syncState);
 
-		//        /**
-		//         * # Safety
-		//         * This must me called with a valid pointer to a JSON string of a change
-		//         */
-		//        intptr_t automerge_encode_change(Backend* backend, Buffer* buffs, const uint8_t* change, uintptr_t len);
+		/// <summary>
+		/// Encodes specified json change
+		/// </summary>
+		/// <param name="backend">Current backend instance</param>
+		/// <param name="buffer">Buffer to write the response to</param>
+		/// <param name="changes">Bytes of the changes in json</param>
+		/// <param name="changeLength">Length of the changes bytes</param>
+		/// <returns>0 if successful, -1 if error</returns>
+		[DllImport(automergeLibPath, EntryPoint = "automerge_encode_change")]
+		public static extern IntPtr EncodeChange(
+			IntPtr backend,
+			Buffer buffer,
+			byte[] change,
+			UIntPtr changeLength);
 
-		///**
-		// * # Safety
-		// * Must be called with a pointer to a valid Backend, sync_state, and buffs
-		// */
-		//intptr_t automerge_encode_sync_state(Backend* backend, Buffer* buffs, SyncState* sync_state);
 
-		//        /**
-		//         * # Safety
-		//         * This must be called with a valid backend pointer
-		//         */
-		//        const char* automerge_error(Backend * backend);
 
-		//        /**
-		//         * # Safety
-		//         * This must be called with a valid backend pointer
-		//         */
-		//        void automerge_free(Backend* backend);
+		/// <summary>
+		/// Encodes the Sync State TODO
+		/// </summary>
+		/// <param name="backend">Current backend instance</param>
+		/// <param name="buffer">Buffer to write results to</param>
+		/// <param name="syncState">TODO</param>
+		/// <returns>0 if successful, -1 if error</returns>
+		[DllImport(automergeLibPath, EntryPoint = "automerge_encode_sync_state")]
+		public static extern IntPtr EncodeSyncState(
+			IntPtr backend,
+			[MarshalAs(UnmanagedType.Struct)] Buffer buffer,
+			IntPtr syncState);
 
-		//        /**
-		//         * # Safety
-		//         * Must point to a valid `Buffers` struct
-		//         * Free the memory a `Buffers` struct points to
-		//         */
-		//        intptr_t automerge_free_buff(Buffer* buffs);
 
-		//        /**
-		//         * # Safety
-		//         * Must be called with a valid backend pointer
-		//         * sync_state must be a valid pointer to a SyncState
-		//         * Returns an `isize` indicating the length of the binary message
-		//         * (-1 if there was an error, 0 if there is no message)
-		//         */
-		//        intptr_t automerge_generate_sync_message(Backend* backend, Buffer* buffs, SyncState* sync_state);
+		/// <summary>
+		/// TODO
+		/// </summary>
+		/// <param name="backend">Current backend instance</param>
+		/// <returns>TODO</returns>
+		[DllImport(automergeLibPath, EntryPoint = "automerge_error", CharSet = CharSet.Auto)]
+		public static extern string Error(IntPtr backend);
 
-		//        /**
-		//         * # Safety
-		//         * This must be called with a valid backend pointer,
-		//         * binary must be a valid pointer to `hashes` hashes
-		//         */
-		//        intptr_t automerge_get_changes(Backend* backend, Buffer* buffs, const uint8_t* bin, uintptr_t hashes);
+		/// <summary>
+		/// Dipose of the backend and frees its resources
+		/// </summary>
+		/// <param name="backend">Current backend instance</param>
+		[DllImport(automergeLibPath, EntryPoint = "automerge_free")]
+		public static extern void Free(IntPtr backend);
 
-		///**
-		// * # Safety
-		// * This must be called with a valid pointer to a `Backend`
-		// * and a valid C String
-		// */
-		//intptr_t automerge_get_changes_for_actor(Backend* backend, Buffer* buffs, const char* actor);
+		/// <summary>
+		/// Dipose of the buffer and frees its resources
+		/// </summary>
+		/// <param name="backend">Current backend instance</param>
+		/// <returns>0 if successful, -1 if error</returns>
+		[DllImport(automergeLibPath, EntryPoint = "automerge_free")]
+		public static extern IntPtr Free([MarshalAs(UnmanagedType.Struct)]Buffer backend);
 
-		//        /**
-		//         * # Safety
-		//         * This must be called with a valid backend pointer
-		//         */
-		//        intptr_t automerge_get_heads(Backend* backend, Buffer* buffs);
 
-		//        /**
-		//         * # Safety
-		//         */
-		//        intptr_t automerge_get_last_local_change(Backend* backend, Buffer* buffs);
+		/// <summary>
+		/// Generates sync message TODO
+		/// </summary>
+		/// <param name="backend">Current backend instance</param>
+		/// <param name="buffer">Buffer to write results to</param>
+		/// <param name="syncState">TODO</param>
+		/// <returns>Length of bytes written</returns>
+		[DllImport(automergeLibPath, EntryPoint = "automerge_generate_sync_message")]
+		public static extern IntPtr GenerateSyncMessage(
+			IntPtr backend,
+			[MarshalAs(UnmanagedType.Struct)] Buffer buffer,
+			IntPtr syncState);
 
-		//        /**
-		//         * # Safety
-		//         * This must be called with a valid backend pointer,
-		//         * binary must be a valid pointer to len bytes
-		//         */
-		//        intptr_t automerge_get_missing_deps(Backend* backend, Buffer* buffs, const uint8_t* bin, uintptr_t len);
+		/// <summary>
+		/// Get changes TODO
+		/// </summary>
+		/// <param name="backend">Current backend instance</param>
+		/// <param name="buffer">Buffer to write results to</param>
+		/// <param name="bytes">TODO</param>
+		/// <param name="hashes">TODO</param>
+		/// <returns>Length of bytes written</returns>
+		[DllImport(automergeLibPath, EntryPoint = "automerge_get_changes")]
+		public static extern IntPtr GetChanges(
+			IntPtr backend,
+			[MarshalAs(UnmanagedType.Struct)] Buffer buffer,
+			byte[] bytes,
+			IntPtr hashes);
 
-		///**
-		// * # Safety
-		// * This should be called with a valid pointer to a `Backend`
-		// * and a valid pointer to a `Buffers``
-		// */
-		//intptr_t automerge_get_patch(Backend* backend, Buffer* buffs);
+		/// <summary>
+		/// Get changes for a sepcified actor TODO
+		/// </summary>
+		/// <param name="backend">Current backend instance</param>
+		/// <param name="buffer">Buffer to write results to</param>
+		/// <param name="actor">The id of the actor to get changes for</param>
+		/// <returns>Length of bytes written</returns>
+		[DllImport(automergeLibPath, EntryPoint = "automerge_get_changes_for_actor")]
+		public static extern IntPtr GetChangesForActor(
+			IntPtr backend,
+			[MarshalAs(UnmanagedType.Struct)] Buffer buffer,
+			string actor);
 
-		//        /**
-		//         * # Safety
-		//         * This must be called with a valid pointer to len bytes
-		//         */
-		//        Backend* automerge_load(const uint8_t* data, uintptr_t len);
+		/// <summary>
+		/// Get heads TODO
+		/// </summary>
+		/// <param name="backend">Current backend instance</param>
+		/// <param name="buffer">Buffer to write results to</param>
+		/// <returns>Length of bytes written</returns>
+		[DllImport(automergeLibPath, EntryPoint = "automerge_get_heads")]
+		public static extern IntPtr GetHeads(
+			IntPtr backend,
+			[MarshalAs(UnmanagedType.Struct)] Buffer buffer);
 
-		///**
-		// * # Safety
-		// * This should be called with a valid pointer to a `Backend`
-		// * and a valid pointers to a `CBuffers`
-		// */
-		//intptr_t automerge_load_changes(Backend* backend, const uint8_t* changes, uintptr_t changes_len);
+		/// <summary>
+		/// Get last local change TODO
+		/// </summary>
+		/// <param name="backend">Current backend instance</param>
+		/// <param name="buffer">Buffer to write results to</param>
+		/// <returns>Length of bytes written</returns>
+		[DllImport(automergeLibPath, EntryPoint = "automerge_get_last_local_change")]
+		public static extern IntPtr GetLastLocalChange(
+			IntPtr backend,
+			[MarshalAs(UnmanagedType.Struct)] Buffer buffer);
 
-		///**
-		// * # Safety
-		// * Must be called with a valid backend pointer
-		// * sync_state must be a valid pointer to a SyncState
-		// * `encoded_msg_[ptr|len]` must be the address & length of a byte array
-		// */
-		//intptr_t automerge_receive_sync_message(Backend* backend,
-		//                                        Buffer* buffs,
-		//                                        SyncState* sync_state,
-		//                                        const uint8_t* encoded_msg_ptr,
-		//                                        uintptr_t encoded_msg_len);
+		
+		/// <summary>
+		/// TODO
+		/// </summary>
+		/// <param name="backend">Current backend instance</param>
+		/// <param name="buffer">Buffer to write the response to</param>
+		/// <param name="changes">Bytes of the changes in json</param>
+		/// <param name="changeLength">Length of the changes bytes</param>
+		/// <returns>0 if successful, -1 if error</returns>
+		[DllImport(automergeLibPath, EntryPoint = "automerge_get_missing_deps")]
+		public static extern IntPtr GetMissingDeps(
+			IntPtr backend,
+			[MarshalAs(UnmanagedType.Struct)] Buffer buffer,
+			byte[] change,
+			UIntPtr changeLength);
 
-		///**
-		// * # Safety
-		// * This should be called with a valid pointer to a `Backend`
-		// */
-		//intptr_t automerge_save(Backend* backend, Buffer* buffs);
 
-		//        /**
-		//         * # Safety
-		//         * sync_state must be a valid pointer to a SyncState
-		//         */
-		//        void automerge_sync_state_free(SyncState* sync_state);
+		/// <summary>
+		/// TODO
+		/// </summary>
+		/// <param name="backend">Current backend instance</param>
+		/// <param name="buffer">Buffer to write the response to</param>
+		/// <returns>0 if successful, -1 if error</returns>
+		[DllImport(automergeLibPath, EntryPoint = "automerge_get_patch")]
+		public static extern IntPtr GetPatch(
+			IntPtr backend,
+			[MarshalAs(UnmanagedType.Struct)] Buffer buffer);
 
-		//        SyncState* automerge_sync_state_init(void);
 
-		//        /**
-		//         * # Safety
-		//         * This must be called with a valid C-string
-		//         */
-		//        intptr_t debug_json_change_to_msgpack(const char* change, uint8_t **out_msgpack, uintptr_t* out_len);
+		/// <summary>
+		/// TODO
+		/// </summary>
+		/// <param name="bytes">TODO</param>
+		/// <param name="bytesLength">Length of the bytes</param>
+		/// <returns>Backend instance</returns>
+		[DllImport(automergeLibPath, EntryPoint = "automerge_load")]
+		public static extern IntPtr Load(byte[] bytes, UIntPtr bytesLength);
 
-		//        /**
-		//         * # Safety
-		//         * This must be called with a valid pointer to len bytes
-		//         */
-		//        intptr_t debug_msgpack_change_to_json(const uint8_t* msgpack, uintptr_t len, uint8_t* out_json);
 
-		//        /**
-		//         * # Safety
-		//         * `prefix` & `buff` must be valid pointers
-		//         */
-		//        void debug_print_msgpack_patch(const char* prefix, const uint8_t* buff, uintptr_t len);
+		/// <summary>
+		/// Load changes from bytes TODO
+		/// </summary>
+		/// <param name="backend">Current backend instance</param>
+		/// <param name="changes">TODO</param>
+		/// <param name="changesLength">Length of the changes bytes</param>
+		/// <returns>TODO</returns>
+		[DllImport(automergeLibPath, EntryPoint = "automerge_load_changes")]
+		public static extern IntPtr LoadChanges(IntPtr backend, byte[] changes, UIntPtr changesLength);
 
+		/// <summary>
+		/// Receive sync message TODO
+		/// </summary>
+		/// <param name="backend">Current backend instance</param>
+		/// <param name="buffer">Buffer to write the response to</param>
+		/// <param name="syncState">TODO</param>
+		/// <param name="encodedMessage">Bytes of the encoded message</param>
+		/// <param name="changesLength">Length of the encoded message bytes</param>
+		/// <returns>TODO</returns>
+		[DllImport(automergeLibPath, EntryPoint = "automerge_receive_sync_message")]
+		public static extern IntPtr ReceiveSyncMessage(
+			IntPtr backend, 
+			[MarshalAs(UnmanagedType.Struct)]Buffer buffer,
+			IntPtr syncState,
+			byte[] encodedMessage,
+			UIntPtr encodedMessageLength);
+
+
+		/// <summary>
+		/// Save TODO
+		/// </summary>
+		/// <param name="backend">Current backend instance</param>
+		/// <param name="buffer">Buffer to write the response to</param>
+		/// <returns>TODO</returns>
+		[DllImport(automergeLibPath, EntryPoint = "automerge_save")]
+		public static extern IntPtr Save(
+			IntPtr backend, 
+			[MarshalAs(UnmanagedType.Struct)]Buffer buffer);
+
+		/// <summary>
+		/// Dispose sync state and free its resources
+		/// </summary>
+		/// <param name="syncState">Sync state to dispose</param>
+		[DllImport(automergeLibPath, EntryPoint = "automerge_sync_state_free")]
+		public static extern void SyncStateFree(IntPtr syncState);
+		
+		/// <summary>
+		/// Initialize new sync state to use
+		/// </summary>
+		/// <param name="syncState">Sync state to dispose</param>
+		/// <returns>New sync state instace</returns>
+		[DllImport(automergeLibPath, EntryPoint = "automerge_sync_state_init")]
+		public static extern IntPtr SyncStateInit();
+				
+		
+		/// <summary>
+		/// TODO
+		/// </summary>
+		/// <param name="change">Json change</param>
+		/// <param name="msgpack">Msgpack converted from json</param>
+		/// <param name="msgpackLength">Msgpack byte length</param>
+		/// <returns>TODO</returns>
+		[DllImport(automergeLibPath, EntryPoint = "debug_json_change_to_msgpack")]
+		public static extern IntPtr DebugJsonChangeToMsgpack(
+			string change,
+			out byte[] msgpack,
+			out UIntPtr msgpackLength
+		);	
+		
+		/// <summary>
+		/// TODO
+		/// </summary>
+		/// <param name="msgpack">TODO</param>
+		/// <param name="msgpackLength">Msgpack byte length</param>
+		/// <param name="json">Json converted from from msgpack</param>
+		/// <returns>TODO</returns>
+		[DllImport(automergeLibPath, EntryPoint = "debug_msgpack_change_to_json")]
+		public static extern IntPtr DebugMsgpackChangeToJson(
+			out byte[] msgpack,
+			out UIntPtr msgpackLength,
+			out byte[] json
+		);
+		
+		/// <summary>
+		/// TODO
+		/// </summary>
+		/// <param name="prefix">TODO</param>
+		/// <param name="buffer">TODO</param>
+		/// <param name="bufferLength">Length of the buffer in bytes</param>
+		/// <returns>TODO</returns>
+		[DllImport(automergeLibPath, EntryPoint = "debug_print_msgpack_patch")]
+		public static extern void DebugPrintMsgpackPatch(
+			string[] prefix,
+			byte[] buffer,
+			UIntPtr bufferLength
+		);
 	}
 }

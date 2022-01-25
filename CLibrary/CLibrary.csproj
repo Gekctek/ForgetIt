@@ -7,6 +7,11 @@
     <LangVersion>latest</LangVersion>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
+
+  <PropertyGroup Condition="$([MSBuild]::IsOSPlatform('Windows'))">
+    <DefineConstants>_WINDOWS</DefineConstants>
+  </PropertyGroup>
+
   <ItemGroup>
     <None Update="automerge\libautomerge-linux.so" Condition="$([MSBuild]::IsOSPlatform('Linux'))">
 			<Link>libautomerge.so</Link>

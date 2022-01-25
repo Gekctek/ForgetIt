@@ -25,7 +25,7 @@ namespace Automerge
 
         public void Dispose()
         {
-            // TODO
+            AutomergeLib.
         }
 
         public static AutomergeBackend Init()

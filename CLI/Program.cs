@@ -20,7 +20,8 @@ namespace CLI
 					automerge.ApplyLocalChange("{}");
 				}
 
-					Console.WriteLine();
+				Console.WriteLine();
+				Console.ReadLine();
 			}
 		}
 	}
