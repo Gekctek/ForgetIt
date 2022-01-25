@@ -1,37 +1,44 @@
 ﻿using Data;
 using ForgetIt.Core;
 using SQLite;
+using System;
 using System.Text.Json;
+using Automerge;
 
-var store = new SQLiteOperationStore(new SQLiteConnection("Operations.db"));
-
-
-ObjectInfo objectInfo = store.Get("1", "note");
-
-State state;
-if (!objectInfo.Operations.Any())
+using(AutomergeBackend automerge = AutomergeBackend.Init())
 {
-	var newNote = new Note("me", DateTime.UtcNow, "Hello World!", DateTime.UtcNow);
-	state = new State("1", "note");
-	List<PatchOperation> operations = state.Update(newNote);
-	if (operations.Any())
-	{
-		var info = new ObjectInfo(objectInfo.Id, objectInfo.Type, operations);
-		store.Add(info);
-	}
+	string result = automerge.ApplyLocalChange("{}");
+	Console.WriteLine(result);
 }
-else
-{
-	state = new State(objectInfo.Id, objectInfo.Type, objectInfo.Operations);
-}
+// var store = new SQLiteOperationStore(new SQLiteConnection("Operations.db"));
 
 
-Note note = state.Build<Note>();
+// ObjectInfo objectInfo = store.Get("1", "note");
+
+// State state;
+// if (!objectInfo.Operations.Any())
+// {
+// 	var newNote = new Note("me", DateTime.UtcNow, "Hello World!", DateTime.UtcNow);
+// 	state = new State("1", "note");
+// 	List<PatchOperation> operations = state.Update(newNote);
+// 	if (operations.Any())
+// 	{
+// 		var info = new ObjectInfo(objectInfo.Id, objectInfo.Type, operations);
+// 		store.Add(info);
+// 	}
+// }
+// else
+// {
+// 	state = new State(objectInfo.Id, objectInfo.Type, objectInfo.Operations);
+// }
+
+
+// Note note = state.Build<Note>();
 
 
 
-foreach (PatchOperation operation in state.Operations)
-{
-	Console.WriteLine(operation.ToString());
-}
-Console.WriteLine(JsonSerializer.Serialize(note));
+// foreach (PatchOperation operation in state.Operations)
+// {
+// 	Console.WriteLine(operation.ToString());
+// }
+// Console.WriteLine(JsonSerializer.Serialize(note));

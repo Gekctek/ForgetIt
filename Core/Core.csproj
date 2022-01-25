@@ -4,6 +4,7 @@
     <TargetFramework>net6</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
     <AssemblyName>ForgetIt.$(MSBuildProjectName)</AssemblyName>
     <RootNamespace>ForgetIt.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
   </PropertyGroup>
