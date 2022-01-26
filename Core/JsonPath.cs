@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace ForgetIt.Core
+namespace Automerge
 {
 	public class JsonPath
 	{
@@ -48,6 +48,11 @@ namespace ForgetIt.Core
 		public static JsonPath Empty()
 		{
 			return new JsonPath(new JsonPathSegment[0]);
+		}
+
+		public static JsonPath PropertyName(string propertyName)
+		{
+			return new JsonPath(new JsonPathSegment[1] { JsonPathSegment.Property(propertyName) });
 		}
 	}
 

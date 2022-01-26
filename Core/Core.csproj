@@ -1,12 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>net6</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 		<LangVersion>latest</LangVersion>
-    <AssemblyName>ForgetIt.$(MSBuildProjectName)</AssemblyName>
-    <RootNamespace>ForgetIt.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
+    <AssemblyName>Automerge.$(MSBuildProjectName)</AssemblyName>
+    <RootNamespace>Automerge.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
     <UserSecretsId>7beb6b70-243d-47cd-b226-9046b8588e6f</UserSecretsId>
   </PropertyGroup>
 

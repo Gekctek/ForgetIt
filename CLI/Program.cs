@@ -1,9 +1,10 @@
-﻿using Data;
-using ForgetIt.Core;
+﻿using Automerge;
+using Automerge.Core;
 using SQLite;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json;
-using Automerge;
 
 
 namespace CLI
@@ -14,12 +15,13 @@ namespace CLI
 		{
 			using (AutomergeBackend automerge = AutomergeBackend.Init())
 			{
-				var change1 = new Change(operations)
-				automerge.ApplyLocalChange(change1);
-				using (AutomergeBackend automerge2 = automerge.Clone())
-				{
-					automerge.ApplyLocalChange(change2));
-				}
+				var id = ObjectId.Root();
+				var state = new State(id);
+				state.Set("Test", ScalarValue.Boolean(true));
+
+				Change change = state.BuildChange();
+
+				automerge.ApplyLocalChange(change);
 
 				Console.WriteLine();
 				Console.ReadLine();
