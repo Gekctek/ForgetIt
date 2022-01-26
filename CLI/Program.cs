@@ -14,10 +14,11 @@ namespace CLI
 		{
 			using (AutomergeBackend automerge = AutomergeBackend.Init())
 			{
-				automerge.ApplyLocalChange("{}");
+				var change1 = new Change(operations)
+				automerge.ApplyLocalChange(change1);
 				using (AutomergeBackend automerge2 = automerge.Clone())
 				{
-					automerge.ApplyLocalChange("{}");
+					automerge.ApplyLocalChange(change2));
 				}
 
 				Console.WriteLine();

@@ -442,7 +442,7 @@ namespace ForgetIt.Core
 		}
 	}
 
-	public enum OperationType
+	public enum PatchOperationType
 	{
 		Add,
 		Remove,

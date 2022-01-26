@@ -26,7 +26,7 @@ namespace CLibrary
 		/// <param name="changeLength">Length of the changes bytes</param>
 		/// <returns>Length of the result written to the buffer</returns>
 		[DllImport(automergeLibPath, EntryPoint = "automerge_apply_local_change", CharSet = CharSet.Ansi)]
-		public static extern int ApplyLocalChange(
+		public static extern IntPtr ApplyLocalChange(
 			IntPtr backend,
 			[MarshalAs(UnmanagedType.Struct)] Buffer buffer,
 			byte[] changes,
@@ -107,27 +107,27 @@ namespace CLibrary
 
 
 		/// <summary>
-		/// TODO
+		/// Gets the last error message
 		/// </summary>
 		/// <param name="backend">Current backend instance</param>
-		/// <returns>TODO</returns>
+		/// <returns>Last error message</returns>
 		[DllImport(automergeLibPath, EntryPoint = "automerge_error", CharSet = CharSet.Auto)]
-		public static extern string Error(IntPtr backend);
+		public static extern string GetLastErrorMessage(IntPtr backend);
 
 		/// <summary>
 		/// Dipose of the backend and frees its resources
 		/// </summary>
 		/// <param name="backend">Current backend instance</param>
 		[DllImport(automergeLibPath, EntryPoint = "automerge_free")]
-		public static extern void Free(IntPtr backend);
+		public static extern void DisposeBackend(IntPtr backend);
 
 		/// <summary>
 		/// Dipose of the buffer and frees its resources
 		/// </summary>
-		/// <param name="backend">Current backend instance</param>
+		/// <param name="buffer">Buffer to dispose</param>
 		/// <returns>0 if successful, -1 if error</returns>
-		[DllImport(automergeLibPath, EntryPoint = "automerge_free")]
-		public static extern IntPtr Free([MarshalAs(UnmanagedType.Struct)]Buffer backend);
+		[DllImport(automergeLibPath, EntryPoint = "automerge_free_buff")]
+		public static extern IntPtr DisposeBuffer([MarshalAs(UnmanagedType.Struct)]Buffer backend);
 
 
 		/// <summary>
@@ -276,7 +276,7 @@ namespace CLibrary
 		/// </summary>
 		/// <param name="syncState">Sync state to dispose</param>
 		[DllImport(automergeLibPath, EntryPoint = "automerge_sync_state_free")]
-		public static extern void SyncStateFree(IntPtr syncState);
+		public static extern void DisposeSyncState(IntPtr syncState);
 		
 		/// <summary>
 		/// Initialize new sync state to use
