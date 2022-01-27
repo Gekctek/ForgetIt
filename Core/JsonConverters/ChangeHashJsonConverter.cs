@@ -3,14 +3,13 @@ using System.Text.Json.Serialization;
 using ForgetIt.Core;
 using System;
 
-namespace Automerge
+namespace Automerge.Core.JsonConverters
 {
-    public class ChangeHashConverter : JsonConverter<ChangeHash>
+    public class ChangeHashJsonConverter : JsonConverter<ChangeHash>
     {
-        public override ChangeHash? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        public override ChangeHash Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
-            string? value = reader.GetString();
-            byte[] hash = Convert.FromBase64String(value);
+            byte[] hash = reader.GetBytesFromBase64();
             return new ChangeHash(hash);
         }
 

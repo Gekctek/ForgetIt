@@ -8,34 +8,37 @@ namespace Automerge
 {
 	public class Change
 	{
-		[JsonPropertyName("ops")]
-		public List<Operation> Operations { get; init; }
+		public IReadOnlyList<Operation> Operations { get; }
+		public ActorId ActorId { get; }
+		public ChangeHash? ChangeHash { get; }
+		public long Seq { get; } // TODO better name
+		public ulong StartOp { get;} // TODO better name
+		public long LogicalTime { get; }
+		public string? Message { get; }
+		public IReadOnlyList<ChangeHash> Dependencies { get; } // TODO better name
+		public byte[]? ExtraBytes { get; }
 
-		[JsonPropertyName("actor")]
-		public ActorId ActorId { get; init; }
-
-		[JsonPropertyName("hash")]
-		// TODO ignore if null
-		public ChangeHash? ChangeHash { get; init; }
-
-		[JsonPropertyName("seq")]
-		public long Seq { get; init; } // TODO better name
-
-		[JsonPropertyName("startOp")]
-		public ulong StartOp { get; init; } // TODO better name
-
-		[JsonPropertyName("time")]
-		public long LogicalTime { get; init; }
-
-		[JsonPropertyName("message")]
-		public string? Message { get; init; }
-
-		[JsonPropertyName("deps")]
-		public List<ChangeHash> Deps { get; init; } // TODO better name
-
-		[JsonPropertyName("extra_bytes")]
-		// TODO skip if empty
-		public byte[] ExtraBytes { get; init; }
+		public Change(
+			IEnumerable<Operation> operations,
+			ActorId actorId,
+			ChangeHash? changeHash,
+			long seq,
+			ulong startOp,
+			long logicalTime,
+			string? message,
+			IEnumerable<ChangeHash> dependencies,
+			byte[]? extraBytes = null)
+		{
+			this.Operations = operations?.ToList() ?? throw new ArgumentNullException(nameof(operations));
+			this.ActorId = actorId ?? throw new ArgumentNullException(nameof(actorId));
+			this.ChangeHash = changeHash;
+			this.Seq = seq;
+			this.StartOp = startOp;
+			this.LogicalTime = logicalTime;
+			this.Message = message;
+			this.Dependencies = dependencies?.ToList() ?? throw new ArgumentNullException(nameof(dependencies));
+			this.ExtraBytes = extraBytes;
+		}
 	}
 
 	public class ChangeHash

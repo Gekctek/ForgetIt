@@ -36,18 +36,28 @@ namespace Automerge.Core
 
 		public Change BuildChange(ActorId actorId, long logicalTime, string message)
 		{
-			return new Change
-			{
-				ChangeHash = changeHash,
-				ActorId = actorId,
-				Deps = deps,
-				ExtraBytes = extraBytes,
-				LogicalTime = logicalTime,
-				Message = message,
-				Operations = this._operations.ToList(),
-				Seq = seq,
-				StartOp = startOp
-			};
+			(ChangeHash hash, List<ChangeHash> dependencies) = BuildChangeHash();
+			byte[] extraBytes = null; // TODO
+			long seq = 0; // TODO
+			ulong startOp = 0; // TODO
+			return new Change(
+				operations: this._operations.ToList(),
+				actorId: actorId,
+				changeHash: hash,
+				seq: seq,
+				startOp: startOp,
+				logicalTime: logicalTime,
+				message: message,
+				dependencies: dependencies,
+				extraBytes: extraBytes
+			);
+		}
+
+		private (ChangeHash Hash, List<ChangeHash> Dependencies) BuildChangeHash()
+		{
+			//TODO
+			byte[] hash = new byte[32];
+			return (new ChangeHash(hash), new List<ChangeHash>());
 		}
 
 		//public Operation Update<T, TProperty>(Expression<Func<T, TProperty>> propertyExpr, TProperty value)
@@ -81,7 +91,7 @@ namespace Automerge.Core
 		public void Add(Operation operation)
 		{
 			this._operations.Add(operation);
-			this._snapshotCache = null;
+			//this._snapshotCache = null;
 		}
 
 		//public T Build<T>()
